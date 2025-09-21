@@ -1,38 +1,115 @@
-----------Main.jsx------------------
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import './index.css'
-import AppRoutes from "./routes/AppRoutes.jsx";
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
-  </React.StrictMode>
-);
-
--------------AppRoutes.jsx-------------
-
-import { Route, Routes } from 'react-router-dom';
-import Home from '../Pages/Home/Home';
-import About from '../Pages/about';
-import MainLayout from '../Layouts/MainLayout';
-import Product from '../Pages/Products/Product';
-
-const AppRoutes = () => {
+ Carosal.jsx
+ import bgImg from "../../assets/images/banner-image-bg.jpg"
+const CarouselSlide = ({title,subtitle,image}) => {
     return (
-        <Routes>
-            <Route element={<MainLayout/>}/> 
-            <Route path='/' element={<Home/>}/>
-            <Route path='product' element={<Product/>}/>
-            <Route path="about" element={<About/>}/>
-        </Routes>
+        <section className="w-full h-[650px] bg-cover bg-center flex justify-center items-center px-4 md:px-8"
+        style={{backgroundImage:`url(${bgImg})`}}
+        >
+            <div className=" mx-w-6xl flex items-center   justify-center px-8" >
+            {/* Left Content */}
+            <div className="w-1/2">
+                <h1 className="text-4xl md:text-5xl text-bold text-gray-900">{title}</h1>
+                <p className="text-gray-600 my-4">{subtitle}</p>
+                <button className="btn btn-secondary px-6 py-3 rounded-full shadow-md">Shop Product</button>
+            </div>
+            {/* Right Content */}
+            <div className="w-1/2 flex justify-center ">
+                <img className="max-w-md drop-shadow-lg" src={image} alt="" />
+            </div>
+        </div>
+
+        </section>
+
     );
 };
 
-export default AppRoutes;
+export default CarouselSlide;
 
 
-ami akna outlet use korlam but ata kno kaj korsa nh bhi 
+
+// HeroCarousal.jsx
+
+
+// Import Swiper React components
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+
+
+// import required modules
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import CarouselSlide from './CarouselSlide';
+import book from "../../assets/images/book.png"
+import fashion from "../../assets/images/fashion.png"
+import technology from "../../assets/images/technology.png"
+
+const HeroCarouSal=()=> {
+     const slides = [
+    {
+      title: "This Fine Print Book Collections",
+      subtitle: "Discount available. Grab it now!",
+      image: book,
+    },
+    {
+      title: "Exclusive Fashion Collections",
+      subtitle: "A specialists label creating luxury essentials!",
+      image: fashion,
+    },
+    {
+      title: "Your Digital World, Connected.",
+      subtitle: "Explore a range of devices for seamless living.",
+      image: technology,
+    },
+  ];
+  return (
+    <>
+      <Swiper
+        centeredSlides={true}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+        }}
+        pagination={{
+          clickable: true,
+        }}
+        navigation={true}
+        modules={[Autoplay, Pagination, Navigation]}
+        className="mySwiper"
+      >
+        {slides.map=(slide,index)=>(
+            <SwiperSlide key={index}>
+            <CarouselSlide title={slide.title} subtitle={slide.title} image={slide.image}/>
+        </SwiperSlide>
+        )}
+       
+
+      </Swiper>
+    </>
+  );
+}
+export default HeroCarouSal;
+
+home .jsx
+
+
+import React from 'react';
+import HeroCarouSal from '../components/Carousel/HeroCarouSal';
+
+const Home = () => {
+    return (
+        <div>
+             {/* <CarouselSlide/> */}
+             <HeroCarouSal/>
+        </div>
+    );
+};
+
+export default Home;
+
+
+
+
+amier home page ta show korca nh kno 
