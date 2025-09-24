@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import apiClient from "../../services/api-client";
+import apiClient from "../../../services/api-client";
 import CategoriesItem from "./categoriesItem";
 
 const Category = () => {
@@ -20,8 +20,8 @@ const Category = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {
-                categories.map((category)=>(
-                    <CategoriesItem key={category.id} category={category}/>
+                categories.map((category,index)=>(
+                    <CategoriesItem key={category.id} category={category} index={index}/>
                 ))
             }
         </div>

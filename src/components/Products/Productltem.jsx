@@ -3,7 +3,7 @@ import defaultImage from "../../assets/images/default_product.jpg";
 const Productltem = ({ product }) => {
   return (
     <div>
-      <div className="card bg-base-100 w-96 shadow-sm">
+      <div className="card bg-base-100 w-96 shadow-sm ">
         <figure className="px-10 pt-10">
           <img
             src={product.images.length > 0 ? product.images[0]: defaultImage}
@@ -18,7 +18,7 @@ const Productltem = ({ product }) => {
             {product.description}
           </p>
           <div className="card-actions">
-            <button className="btn btn-primary rounded-full">Buy Now</button>
+            <button className="btn  text-white bg-pink-600 rounded-full">Buy Now</button>
           </div>
         </div>
       </div>

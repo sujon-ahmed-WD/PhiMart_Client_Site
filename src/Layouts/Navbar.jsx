@@ -28,10 +28,10 @@ const Navbar = () => {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
             >
               <li>
-                <Link ></Link>
+               new
               </li>
               <li>
-                <a>Item 3</a>
+                <Link to={"/shop"}>Shop</Link>
               </li>
             </ul>
           </div>
@@ -44,7 +44,7 @@ const Navbar = () => {
               <a>Item 1</a>
             </li>
             <li>
-              <a>Item 3</a>
+             <Link to={"/shop"}>Shop</Link>
             </li>
           </ul>
         </div>

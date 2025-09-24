@@ -1,5 +1,5 @@
-import bgImag from "../../assets/images/banner-image-bg-1.jpg"
-import bookimage from "../../assets/images/banner-image3.png"
+import bgImag from "../../../assets/images/banner-image-bg-1.jpg"
+import bookimage from "../../../assets/images/banner-image3.png"
 import DiscountCounter from './DiscountCounter';
  
 

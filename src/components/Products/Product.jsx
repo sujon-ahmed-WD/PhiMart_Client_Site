@@ -31,8 +31,8 @@ const Product = () => {
 
        {/* Spaner */}
        {
-           isLoading &&(
-            <div className="flex justify-center py-16">
+isLoading &&(
+        <div className="flex justify-center py-16">
         <span className="loading loading-spinner text-secondary"></span>
        </div>
         )
