@@ -1,5 +1,3 @@
-login.jsx
-
 
 import { useForm } from 'react-hook-form';
 import { Link } from "react-router-dom";
@@ -90,60 +88,3 @@ const onSubmit = (data) => {
 };
 
 export default Login;
-
-// hook/useAuthContext.js
-import { useContext } from "react";
-import AuthContext from "../context/AuthContext";
-
-const useAuthContext = () => {
-  return useContext(AuthContext);
-};
-
-export default useAuthContext;
-
-
-// context/AuthContext.js
-import { createContext } from "react";
-import useAuth from "../hook/useAuth"
-const AuthContext = createContext();
-
-export const AuthProvider = ({ children }) => {
-  const allContext = useAuth();
-
-  return (
-    <AuthContext.Provider value={allContext}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export default AuthContext;
-useAuth.jsx
-
-import { useState } from "react";
-import apiClient from "../services/api-client";
-
-const useAuth = () => {
-    const [user, setUser] = useState(null);
-
-    const getToken = () => {
-        const token = localStorage.getItem("AuthTokens");
-        return token ? JSON.parse(token) : null;
-    };
-    const [authTokens, setAuthTokens] = useState(getToken());
-
-    // Login user
-    const loginUser = async (userData) => {
-        console.log(userData)
-        const response = await apiClient.post("auth/jwt/create/", userData);
-        console.log(response.data)
-    }
-
-    return { user, loginUser }
-};
-export default useAuth;
-
-
-bhi amier akna kaj ta ke hoisa ami keso busta parci nh amka aktu explan kora deta halfull hoito 
-
-akhon ami samna jabo new larn korta nh ke just dhakha jamu 

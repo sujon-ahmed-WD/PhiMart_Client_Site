@@ -49,8 +49,8 @@ const Navbar = () => {
           </ul>
         </div>
 
-        <div className="navbar-end">
-          <div className="dropdown dropdown-end">
+        <div className="navbar-end   ">
+          <div className="dropdown dropdown-end flex gap-2.5">
             <div
               tabIndex={0}
               role="button"
@@ -59,10 +59,11 @@ const Navbar = () => {
               <div className="indicator">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-8 w-8"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                 
                 >
                   <path
                     strokeLinecap="round"
@@ -80,10 +81,11 @@ const Navbar = () => {
               role="button"
               className="btn btn-ghost btn-circle avatar"
             >
-              <div className="w-10 rounded-full">
+              <div className="w-10 h-10 rounded-full">
                 <img
                   alt="Tailwind CSS Navbar component"
                   src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                  className="w-10 h-10"
                 />
               </div>
 

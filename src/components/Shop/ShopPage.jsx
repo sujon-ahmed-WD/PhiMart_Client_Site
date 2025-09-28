@@ -1,9 +1,9 @@
 import { useState } from "react";
 import Products_list from "./Products_list";
 import Paginations from "./Paginations";
-import useFetchProduct from "../hooks/useFetchProducts.js";
 import FilterSection from "./FilterSection";
-import useFetchCategories from "../hooks/useFetchCategories.js";
+import useFetchCategories from "../../hook/useFetchCategories";
+import useFetchProduct from "../../hook/useFetchProducts";
 
 const ShopPage = () => {
   const [currentPage, SetcurrentPage] = useState(1);
