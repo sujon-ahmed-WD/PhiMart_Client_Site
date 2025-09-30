@@ -1,7 +1,8 @@
-import React from "react";
 import { Link, NavLink } from "react-router-dom";
+import useAuthContext from "../hook/useAuthContext";
 
 const Navbar = () => {
+  const{user}=useAuthContext()
   return (
     <>
       <div className="navbar bg-base-100 shadow-sm">
@@ -50,6 +51,8 @@ const Navbar = () => {
         </div>
 
         <div className="navbar-end   ">
+          {user? (
+          <div>
           <div className="dropdown dropdown-end flex gap-2.5">
             <div
               tabIndex={0}
@@ -91,6 +94,16 @@ const Navbar = () => {
 
             </div>
           </div>
+
+          </div>
+          ):(
+            <div className="flex gap-3">
+              <Link to='/login' className="btn btn-secondary">Login</Link>
+              <Link to='/register' className="btn btn-secondary">Register</Link>
+
+            </div>
+
+          )}
         </div>
       </div>
     </>

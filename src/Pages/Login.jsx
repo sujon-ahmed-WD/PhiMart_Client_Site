@@ -1,7 +1,8 @@
 
 import { useForm } from 'react-hook-form';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useAuthContext from "../hook/useAuthContext"
+import ErroAlert from '../components/ErroAlert';
 
 
 const Login = () => {
@@ -11,10 +12,22 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-const { user, loginUser } = useAuthContext();
 
-const onSubmit = (data) => {
-  loginUser(data);
+const navigate=useNavigate()
+
+const { user, loginUser,errorMsg } = useAuthContext();
+console.log(errorMsg)
+
+const onSubmit = async (data) => {
+  try{
+    await  loginUser(data);
+    navigate("/dashboard")
+  }
+  catch(error)
+  {
+    console.log("Login Error ",error)
+  }
+ 
 };
 
 
@@ -22,6 +35,7 @@ const onSubmit = (data) => {
     <div className="flex min-h-screen items-center justify-center px-4 py-12 bg-base-200">
       <div className="card w-full max-w-md bg-base-100 shadow-xl">
         <div className="card-body">
+          {errorMsg && <ErroAlert error={errorMsg}/>}
           <h2 className="card-title text-2xl font-bold">Sign in</h2>
           <p className="text-base-content/70">
             Enter your email and password to access your account

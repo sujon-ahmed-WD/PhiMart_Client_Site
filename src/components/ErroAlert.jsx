@@ -1,4 +1,5 @@
 const ErroAlert = ({ error }) => {
+  console.log(error)
   return (
     <div role="alert" className="alert alert-error">
       <svg
