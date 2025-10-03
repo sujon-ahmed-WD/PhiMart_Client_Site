@@ -1,9 +1,8 @@
-
-import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from "react-router-dom";
-import useAuthContext from "../hook/useAuthContext"
-import ErroAlert from '../components/ErroAlert';
-
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router";
+import useAuthContext from "../hook/useAuthContext";
+import ErroAlert from "../components/ErroAlert";
+import { useState } from "react";
 
 const Login = () => {
   const {
@@ -12,30 +11,28 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
+  const navigate = useNavigate();
 
-const navigate=useNavigate()
+  const { errorMsg, loginUser } = useAuthContext();
+  const [loading, setLoading] = useState(false);
 
-const { user, loginUser,errorMsg } = useAuthContext();
-console.log(errorMsg)
-
-const onSubmit = async (data) => {
-  try{
-    await  loginUser(data);
-    navigate("/dashboard")
-  }
-  catch(error)
-  {
-    console.log("Login Error ",error)
-  }
- 
-};
-
+  const onSubmit = async (data) => {
+    setLoading(true);
+    try {
+      await loginUser(data);
+      navigate("/dashboard");
+    } catch (error) {
+      console.log("Login Failed", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-12 bg-base-200">
       <div className="card w-full max-w-md bg-base-100 shadow-xl">
         <div className="card-body">
-          {errorMsg && <ErroAlert error={errorMsg}/>}
+          {errorMsg && <ErroAlert error={errorMsg} />}
           <h2 className="card-title text-2xl font-bold">Sign in</h2>
           <p className="text-base-content/70">
             Enter your email and password to access your account
@@ -71,7 +68,7 @@ const onSubmit = async (data) => {
                 type="password"
                 placeholder="••••••••"
                 className={`input input-bordered w-full ${
-                  errors.password ? "input-error" : ""
+                  errors.email ? "input-error" : ""
                 }`}
                 {...register("password", { required: "Password is required" })}
               />
@@ -82,15 +79,19 @@ const onSubmit = async (data) => {
               )}
             </div>
 
-            <button type="submit" className="btn btn-primary w-full">
-              Login
+            <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={loading}
+            >
+              {loading ? "Logging In..." : "Login"}
             </button>
           </form>
 
           <div className="text-center mt-4">
             <p className="text-base-content/70">
               Don&apos;t have an account?{" "}
-              <Link to="/signup" className="link link-primary">
+              <Link to="/register" className="link link-primary">
                 Sign up
               </Link>
             </p>

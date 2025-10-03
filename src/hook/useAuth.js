@@ -47,6 +47,8 @@ const fetchUserProfile = async () => {
         }
 
     }
+    // register User
+    
 
     return { user, loginUser,errorMsg }
 };

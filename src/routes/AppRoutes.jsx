@@ -6,6 +6,7 @@ import Shop from '../Pages/Shop';
 import Login from '../Pages/Login';
 import Register from '../Pages/Register';
 import Dashboard from '../Pages/Dashboard';
+import PrivateRoute from '../components/PrivateRoute';
 const AppRoutes = () => {
     return (
             <Routes>
@@ -15,7 +16,11 @@ const AppRoutes = () => {
                     <Route path="shop" element={<Shop/>}/>
                     <Route path="login" element={<Login/>}/>
                     <Route path="register" element={<Register/>}/>
-                    <Route path="dashboard" element={<Dashboard/>}/>
+                    <Route
+                     path="dashboard"
+                      element={<PrivateRoute>
+                        <Dashboard/>
+                      </PrivateRoute>}/>
                 </Route>
                 
             </Routes>
