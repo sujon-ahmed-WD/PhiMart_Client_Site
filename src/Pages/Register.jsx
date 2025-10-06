@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import useAuthContext from "../hook/useAuthContext";
 import ErroAlert from "../components/ErroAlert";
 import { useState } from "react";
@@ -7,6 +7,8 @@ import { useState } from "react";
 const Register = () => {
   const { registerUser, errorMsg } = useAuthContext();
   const [successMsg, setSuccessMsg] = useState("");
+  const navigate=useNavigate()
+
 
   const {
     register,
@@ -16,18 +18,19 @@ const Register = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    // delete data.confirm_password;
-    // try {
-    //   const response = await registerUser(data);
-    //   console.log(response);
-    //   if (response.success) {
-    //     setSuccessMsg(response.message);
-    //     // setTimeout(() => navigate("/login"), 3000);
-    //   }
-    // } catch (error) {
-    //   console.log("Registration failed", error);
-    // }
-    console.log(data)
+    delete data.confirm_password;
+    try{
+     const response= await registerUser(data);
+     if(response.success){
+        setSuccessMsg(response.message)
+        setTimeout(() => navigate("/login"), 3000);
+     }
+    }
+    catch(error)
+    {
+      console.log("Register failed",error)
+    }
+
   };
 
   return (
@@ -50,9 +53,10 @@ const Register = () => {
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span>{successMsg}</span>
+              <span className="text-white">{successMsg}</span>
             </div>
           )}
+
 
           <h2 className="card-title text-2xl font-bold">Sign Up</h2>
           <p className="text-base-content/70">
@@ -153,7 +157,7 @@ const Register = () => {
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                className="input input-bordered w-full"
+                className="input input-bordered w-full "
                 {...register("password", {
                   required: "Password is required",
                   minLength: {
@@ -191,7 +195,7 @@ const Register = () => {
               )}
             </div>
 
-            <button type="submit" className="btn btn-primary w-full"></button>
+            <button type="submit" className="btn btn-primary w-full">Submet</button>
           </form>
 
           <div className="text-center mt-4">

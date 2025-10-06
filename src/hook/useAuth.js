@@ -4,7 +4,8 @@ import { data } from "react-router";
 
 const useAuth = () => {
     const [user, setUser] = useState(null);
-    const[errorMsg,setErrorMsg]=useState(" ")
+    const[errorMsg,setErrorMsg]=useState("")
+
     console.log(errorMsg)
 
     const getToken = () => {
@@ -49,7 +50,35 @@ const fetchUserProfile = async () => {
     }
     // register User
     
+    const registerUser=async(userData)=>{
+        setErrorMsg(" ")
+        try{
+            await apiClient.post("/auth/users/",userData);
+            return{
+                success:true,
+                message: "Registration successfull. Check your email to activate your account.",
+            };
 
-    return { user, loginUser,errorMsg }
+        }
+        catch(error){
+           if(error.response && error.response.data)
+           {
+                const errorMessage=Object.values(error.response.data).flat().join("\n");
+                setErrorMsg(errorMessage)
+                return{success:false,message:errorMessage}
+           }
+           setErrorMsg("Registration failed. Please try again");
+           
+        }
+    };
+    // Logout User
+    const logoutUser = () => {
+        setAuthTokens(null);
+        setUser(null);
+        localStorage.removeItem("authTokens");
+    };
+    
+
+    return { user, loginUser,errorMsg,registerUser,logoutUser }
 };
 export default useAuth;
