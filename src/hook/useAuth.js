@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import apiClient from "../services/api-client";
-import { data } from "react-router";
+
 
 const useAuth = () => {
     const [user, setUser] = useState(null);
@@ -18,6 +18,22 @@ const useAuth = () => {
        if(authTokens) fetchUserProfile();
 
     },[authTokens]); 
+
+    const handleAPIError =(
+        error,defaultMessage="Something Went Wrong! Try Again"
+    )=>{
+        if(error.response && error.response.data)
+           {
+                const errorMessage=Object.values(error.response.data).flat().join("\n");
+                setErrorMsg(errorMessage)
+                return{success:false,message:errorMessage}
+           }
+           setErrorMsg("Registration failed. Please try again");
+        return{
+            success:false,
+            message:defaultMessage,
+        };
+    };
 // User FetchUser karon ta holo user tokens golo pawor jonno .. .. .. .. .. 
 const fetchUserProfile = async () => { 
     try {
@@ -32,7 +48,34 @@ const fetchUserProfile = async () => {
     }
 };
 
+// Update User Profile
+    const updateUserProfile = async (data)=>{
+        setErrorMsg(" ");
+        try{
+            apiClient.put("/auth/users/me/",data,{
+                headers: { Authorization: `JWT ${authTokens?.access}` },
+            })
+        }catch(error){
+            console.log(error)
+        }
 
+    }
+
+    // Password Change
+
+    const changePassword =async(data)=>{
+        setErrorMsg(" ");
+        try{
+            apiClient.put("/auth/users/set_password/",data,{
+                headers: { Authorization: `JWT ${authTokens?.access}` },
+            })
+        }catch(error){
+            return handleAPIError(error)
+        }
+
+    }
+
+//-------------------      ----------        -------      ----------            
     // Login user
     const loginUser = async (userData) => {
         setErrorMsg("")
@@ -61,13 +104,7 @@ const fetchUserProfile = async () => {
 
         }
         catch(error){
-           if(error.response && error.response.data)
-           {
-                const errorMessage=Object.values(error.response.data).flat().join("\n");
-                setErrorMsg(errorMessage)
-                return{success:false,message:errorMessage}
-           }
-           setErrorMsg("Registration failed. Please try again");
+           return handleAPIError(error,"Registration Failed Error")
            
         }
     };
@@ -79,6 +116,6 @@ const fetchUserProfile = async () => {
     };
     
 
-    return { user, loginUser,errorMsg,registerUser,logoutUser }
+    return { user, loginUser,errorMsg,registerUser,logoutUser,updateUserProfile,changePassword }
 };
 export default useAuth;
