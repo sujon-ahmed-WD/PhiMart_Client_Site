@@ -6,7 +6,7 @@ const useAuth = () => {
     const [user, setUser] = useState(null);
     const[errorMsg,setErrorMsg]=useState("")
 
-    console.log(errorMsg)
+    console.log("SUJON",errorMsg)
 
     const getToken = () => {
         const token = localStorage.getItem("authTokens");

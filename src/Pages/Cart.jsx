@@ -1,9 +1,21 @@
-import React from 'react';
-import useCartContext from '../hook/useCartContext.js';
+import { useState } from "react";
+import useCartContext from "../hook/useCartContext";
 
 const Cart = () => {
-    const{createCart}=useCartContext();
-    return <div>This Cart Pages </div>
+    const [authToken,setAuthToken]=useState(()=>localStorage.getItem("authToken")?.access);
+    // Create a new cart 
+  const { createCart } = useCartContext();
+
+  const handleCreate = async () => {
+    await createCart();
+  };
+
+  return (
+    <div>
+      <h2>This is the create  Page</h2>
+      <button onClick={handleCreate}>Create Cart</button>
+    </div>
+  );
 };
 
 export default Cart;
