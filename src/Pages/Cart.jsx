@@ -4,7 +4,7 @@ import useCartContext from "../hook/useCartContext";
 const Cart = () => {
     const [authToken,setAuthToken]=useState(()=>localStorage.getItem("authToken")?.access);
     // Create a new cart 
-  const { createCart } = useCartContext();
+  const {createCart } = useCartContext();
 
   const handleCreate = async () => {
     await createCart();
