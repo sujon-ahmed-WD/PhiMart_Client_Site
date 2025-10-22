@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { FaCheck, FaShoppingCart } from "react-icons/fa";
 import { FaMinus, FaPlus } from "react-icons/fa6";
+import useCartContext from "../../hook/useCartContext";
 // import useCartContext from "../../hook/useCartContext";
 
 const AddToCartButton = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
-  // const { AddCartItems } = useCartContext();
+  const { AddCartItems } = useCartContext();
 
   const decreaseQuantity = () => {
     if (quantity > 1) {
@@ -21,17 +22,17 @@ const AddToCartButton = ({ product }) => {
     }
   };
 
-  // const addToCart = async () => {
-  //   setIsAdding(true);
-  //   try {
-  //     await AddCartItems(product.id, quantity);
-  //     setIsAdded(true);
-  //     setIsAdding(false);
-  //   } catch (error) {
-  //     console.log(error);
-  //     setIsAdding(false);
-  //   }
-  // };
+  const addToCart = async () => {
+    setIsAdding(true);
+    try {
+      await AddCartItems(product.id, quantity);
+      setIsAdded(true);
+      setIsAdding(false);
+    } catch (error) {
+      console.log(error);
+      setIsAdding(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -60,7 +61,7 @@ const AddToCartButton = ({ product }) => {
       </div>
       <button
         className="btn btn-primary w-full"
-        // onClick={addToCart}
+        onClick={addToCart}
         disabled={isAdding || isAdded || product.stock === 0}
       >
         {isAdding ? (

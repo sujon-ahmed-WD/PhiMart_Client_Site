@@ -45,6 +45,7 @@
 // ✅ useCart.js
 import { useState } from "react";
 import apiClient from "../services/api-client";
+import authApiClient from "../services/auth-api-client";
 
 const useCart = () => {
 
@@ -56,27 +57,31 @@ const useCart = () => {
 
   const createOrGetCart = async () => {
     try {
-      const response = await apiClient.post(
-        "/carts/",
-        {},
-        {
-          headers: {
-            Authorization: `JWT ${authToken}`,
-          },
-        }
-      );
+      const response = await authApiClient.post("/carts/");
       if(!cartId){
         localStorage.setItem("cartId", response.data.id);
         setCartId(response.data.id)
-
       }
       setCart(response.data)
     } catch (error) {
       console.log(error)
     }
+    // Add items to Cart ....
   };
+  const AddCartItems = async(product_id,quantity)=>{
+    if (!cartId) await createOrGetCart()
+    try{
+        const response =await apiClient.post(
+          `/carts/${cartId}/items/`,
+          {product_id,quantity},
+        );
+        return response.data;
+    }catch(error){
+      console.log("Error addinge Items",error)
+    }
+  }
 
-  return { createOrGetCart };
+  return { createOrGetCart,AddCartItems  };
 };
 
 export default useCart;
