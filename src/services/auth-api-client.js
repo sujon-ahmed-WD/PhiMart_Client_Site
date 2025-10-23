@@ -7,10 +7,16 @@ export default authApiClient
 
 authApiClient.interceptors.request.use(
     (config)=>{
-        const token=localStorage.getItem("authToken");
+        const token=localStorage.getItem("authTokens");
+
         if(token)
+
         {
-            config.headers.Authorization =`JWT ${JSON.parse(token)?.access}`
+            const access=JSON.parse(token)?.access
+            // console.log("Hello wordl",access)
+            config.headers.Authorization =`JWT ${access}`
+            // console.log("Cheakinge Token .. .. .. ",JSON.parse(token))
+            // console.log("Cheakinge Token .. .. .. ",token.["access"])
         }
         return config
     },

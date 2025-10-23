@@ -43,7 +43,7 @@
 // export default useCart;
 
 // ✅ useCart.js
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import apiClient from "../services/api-client";
 import authApiClient from "../services/auth-api-client";
 
@@ -55,9 +55,10 @@ const useCart = () => {
   const [cart,setCart]=useState(null);
   const [cartId,setCartId]=useState(()=>localStorage.getItem("cartId"));
 
-  const createOrGetCart = async () => {
+  const createOrGetCart =useCallback(async () => {
     try {
       const response = await authApiClient.post("/carts/");
+      console.log("response",response.data)
       if(!cartId){
         localStorage.setItem("cartId", response.data.id);
         setCartId(response.data.id)
@@ -65,13 +66,13 @@ const useCart = () => {
       setCart(response.data)
     } catch (error) {
       console.log(error)
-    }
-    // Add items to Cart ....
-  };
+    } 
+  },[authToken,cartId])
+  // Add items to Cart ....
   const AddCartItems = async(product_id,quantity)=>{
     if (!cartId) await createOrGetCart()
     try{
-        const response =await apiClient.post(
+        const response =await authApiClient.post(
           `/carts/${cartId}/items/`,
           {product_id,quantity},
         );

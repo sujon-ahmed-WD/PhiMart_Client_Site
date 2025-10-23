@@ -6,10 +6,11 @@ const Cart = () => {
     // Create a new cart 
   const {cart,createOrGetCart } = useCartContext();
   // console.log(createOrGetCart)
+  console.log(cart)
   useEffect(()=>{
+    console.log("Good Job brother and sister .. .. .. ")
     createOrGetCart()
-  },[]);
+  },[createOrGetCart]);
   return <div>{JSON.stringify(cart)}</div>;
 }
-
 export default Cart;
