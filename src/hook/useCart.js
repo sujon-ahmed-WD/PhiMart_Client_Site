@@ -54,7 +54,9 @@ const useCart = () => {
   );
   const [cart,setCart]=useState(null);
   const [cartId,setCartId]=useState(()=>localStorage.getItem("cartId"));
+  const [loading, setLoading] = useState(false);
 
+  // Create a new Cart ........ ......... ............. 
   const createOrGetCart =useCallback(async () => {
     try {
       const response = await authApiClient.post("/carts/");
@@ -81,8 +83,21 @@ const useCart = () => {
       console.log("Error addinge Items",error)
     }
   }
+    // Update Item quantity
+  const updateCartItemQuantity = useCallback(
+    async (itemId, quantity) => {
+      try {
+        await authApiClient.patch(`/carts/${cartId}/items/${itemId}/`, {
+          quantity,
+        });
+      } catch (error) {
+        console.log("Error updating cart items", error);
+      }
+    },
+    [cartId]
+  );
 
-  return { createOrGetCart,AddCartItems  };
+  return { cart,createOrGetCart,AddCartItems,updateCartItemQuantity  };
 };
 
 export default useCart;
