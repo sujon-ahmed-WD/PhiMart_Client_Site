@@ -6,6 +6,7 @@ import CartSummary from "../components/Cart/CartSummary";
 const Cart = () => {
   const {
     cart,
+    cartId,
     loading,
     createOrGetCart,
     updateCartItemQuantity,
@@ -85,17 +86,20 @@ const Cart = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <Suspense fallback={<p>Loading...</p>}>
-            <CartItemList
-              items={localCart.items}
-              handleUpdateQuantity={handleUpdateQuantity}
-              handleRemoveItem={handleRemoveItem}
-            />
+            {localCart?.items && (
+              <CartItemList
+                items={localCart.items}
+                handleUpdateQuantity={handleUpdateQuantity}
+                handleRemoveItem={handleRemoveItem}
+              />
+            )}
           </Suspense>
         </div>
         <div>
           <CartSummary
-            totalPrice={localCart.total_price}
-            itemCount={localCart.items.length}
+            totalPrice={localCart.total_price || 0}
+            itemCount={localCart.items?.length || 0}
+            cartId={cartId}
           />
         </div>
       </div>

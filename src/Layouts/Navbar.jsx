@@ -116,7 +116,7 @@ const Navbar = () => {
                     Subtotal: ${cart?.total_price || 0}
                   </span>
                   <div className="card-actions">
-                    <Link to="dashboard/cart/">
+                    <Link to="/dashboard/cart">
                       <button className="btn btn-primary btn-block">
                         View cart
                       </button>
