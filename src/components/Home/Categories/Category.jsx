@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import apiClient from "../../../services/api-client";
-import CategoriesItem from "./categoriesItem";
+import CategoriesItem from "./CategoriesItem";
 
 const Category = () => {
     const[categories,SetCategories] =useState([])

@@ -13,24 +13,29 @@ const Cart = () => {
     deleteCartItems,
   } = useCartContext();
 
-  const [localCart, setLocalCart] = useState(cart);
+  // Default localCart ensures no undefined errors
+  const [localCart, setLocalCart] = useState({ items: [], total_price: 0 });
 
   useEffect(() => {
     if (!cart && !loading) createOrGetCart();
   }, [createOrGetCart, cart, loading]);
 
   useEffect(() => {
-    setLocalCart(cart);
+    if (cart) {
+      setLocalCart({
+        items: cart.items || [],
+        total_price: cart.total_price || 0,
+      });
+    }
   }, [cart]);
 
   if (loading) return <p>Loading...</p>;
-  if (!localCart) return <p>No Cart Found</p>;
 
   const handleUpdateQuantity = async (itemId, newQuantity) => {
-    const prevLocalCartCopy = localCart; // store a copy of localCart
+    const prevLocalCartCopy = { ...localCart };
 
-    setLocalCart((prevLocalCart) => {
-      const updatedItmes = prevLocalCart.items.map((item) =>
+    setLocalCart((prev) => {
+      const updatedItems = prev.items.map((item) =>
         item.id === itemId
           ? {
               ...item,
@@ -41,12 +46,9 @@ const Cart = () => {
       );
 
       return {
-        ...prevLocalCart,
-        items: updatedItmes,
-        total_price: updatedItmes.reduce(
-          (sum, item) => sum + item.total_price,
-          0
-        ),
+        ...prev,
+        items: updatedItems,
+        total_price: updatedItems.reduce((sum, item) => sum + item.total_price, 0),
       };
     });
 
@@ -54,23 +56,20 @@ const Cart = () => {
       await updateCartItemQuantity(itemId, newQuantity);
     } catch (error) {
       console.log(error);
-      setLocalCart(prevLocalCartCopy); // Rollback to previous state if API fails
+      setLocalCart(prevLocalCartCopy);
     }
   };
 
   const handleRemoveItem = async (itemId) => {
-    setLocalCart((prevLocalCart) => {
-      const updatedItems = prevLocalCart.items.filter(
-        (item) => item.id != itemId
-      );
+    const prevLocalCartCopy = { ...localCart };
+
+    setLocalCart((prev) => {
+      const updatedItems = prev.items.filter((item) => item.id !== itemId);
 
       return {
-        ...prevLocalCart,
+        ...prev,
         items: updatedItems,
-        total_price: updatedItems.reduce(
-          (sum, item) => sum + item.total_price,
-          0
-        ),
+        total_price: updatedItems.reduce((sum, item) => sum + item.total_price, 0),
       };
     });
 
@@ -78,6 +77,7 @@ const Cart = () => {
       await deleteCartItems(itemId);
     } catch (error) {
       console.log(error);
+      setLocalCart(prevLocalCartCopy);
     }
   };
 
@@ -85,20 +85,18 @@ const Cart = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <Suspense fallback={<p>Loading...</p>}>
-            {localCart?.items && (
-              <CartItemList
-                items={localCart.items}
-                handleUpdateQuantity={handleUpdateQuantity}
-                handleRemoveItem={handleRemoveItem}
-              />
-            )}
+          <Suspense fallback={<p>Loading cart items...</p>}>
+            <CartItemList
+              items={localCart.items || []}
+              handleUpdateQuantity={handleUpdateQuantity}
+              handleRemoveItem={handleRemoveItem}
+            />
           </Suspense>
         </div>
         <div>
           <CartSummary
-            totalPrice={localCart.total_price || 0}
-            itemCount={localCart.items?.length || 0}
+            totalPrice={localCart?.total_price || 0}
+            itemCount={localCart?.items?.length || 0}
             cartId={cartId}
           />
         </div>

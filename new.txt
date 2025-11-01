@@ -1,72 +1,346 @@
-import { useEffect, useState } from "react";
-import apiClient from "../services/api-client";
-import { data } from "react-router";
+ Orders.jsx
 
-const useAuth = () => {
-    const [user, setUser] = useState(null);
+ import { useEffect, useState } from "react";
+import OrderCard from "../components/Orders/OrderCard";
+import authApiClient from "../services/auth-api-client";
 
-    const getToken = () => {
-        const token = localStorage.getItem("authTokens");
-        return token ? JSON.parse(token) : null;
-    };
-    const [authTokens, setAuthTokens] = useState(getToken());
+const Orders = () => {
+  const [orders, setOrders] = useState([]);
 
-    useEffect(()=>{ // ae function kno use korsa bhi 
-       if(authTokens) fetchUserProfile();
+  useEffect(() => {
+    authApiClient.get("/orders/").then((res) => setOrders(res.data));
+  }, []);
 
-    },[authTokens]); 
-
-    // Fetch user Profile
-    const fetchUserProfile=async()=>{ 
-        
-        try{
-
-            const response=await apiClient.get("auth/users/me/",{
-                headers:{Authorization: `JWT ${authTokens?.access}`},
-            });
-            if (!response){
-                console.log(response);
-            }
-                
-            
-        } 
-
-        catch(error)
-        {
-            console.log("Error Fletching  user",error)
-        }
+  const handleCancelOrder = async (orderId) => {
+    try {
+      const response = await authApiClient.post(`/orders/${orderId}/cancel/`);
+      console.log(response);
+      if (response.status === 200) {
+        setOrders((prevOrder) =>
+          prevOrder.map((order) =>
+            order.id === orderId ? { ...order, status: "Canceled" } : order
+          )
+        );
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-
-    // Login user
-    const loginUser = async (userData) => {
-        try{
-            const response = await apiClient.post("auth/jwt/create/", userData);
-            setAuthTokens(response.data)
-            localStorage.setItem("authTokens",JSON.stringify(response.data))
-
-        } 
-        catch(error)
-        {
-            console.log("Login Error",error?.data.response)
-        }
-
-    }
-
-    return { user, loginUser }
+  return (
+    <div className="container mx-auto py-8 px-4">
+      <h1 className="text-2xl font-bold mb-6">Order Details</h1>
+      {orders.map((order) => (
+        <OrderCard key={order.id} order={order} onCancel={handleCancelOrder} />
+      ))}
+    </div>
+  );
 };
-export default useAuth;
 
-//        } 
-        
-        catch(error)
-        {
-            console.log("Error Fletching  user",error)
-        }
+export default Orders;
+
+components/Orders/OrderCard.jsx
+import { useState } from "react";
+import useAuthContext from "../../hook/useAuthContext";
+import OrderTable from "./OrderTable";
+import authApiClient from "../../services/auth-api-client";
+
+const OrderCard = ({ order, onCancel }) => {
+  const { user } = useAuthContext();
+  const [status, setStatus] = useState(order.status);
+
+  const handleStatusChange = async (event) => {
+    const newStatus = event.target.value;
+    try {
+      const response = await authApiClient.patch(
+        `/orders/${order.id}/update_status/`,
+        { status: newStatus }
+      );
+      console.log(response);
+      if (response.status === 200) {
+        setStatus(newStatus);
+        alert(response.data.status);
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    amier akna password jodi rong dai tah hola 
-    POST http://127.0.0.1:8000/api/v1/auth/jwt/create/ 401 (Unauthorized)
-    useAuth.js:50 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'response')
+  return (
+    <div className="bg-white rounded-lg shadow-lg mb-8 overflow-hidden">
+      <div className="bg-gray-100 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-bold">Order #{order.id}</h2>
+          <p className="text-gray-600 text-sm">Placed on {order.created_at}</p>
+        </div>
+        <div className="flex gap-2">
+          {user.is_staff ? (
+            <select
+              value={status}
+              onChange={handleStatusChange}
+              className="px-3 py-1 rounded-full text-white text-sm font-medium bg-blue-500"
+            >
+              <option value="Not Paid">Not Paid</option>
+              <option value="Ready To Ship">Ready To Ship</option>
+              <option value="Shipped">Shipped</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Canceled">Canceled</option>
+            </select>
+          ) : (
+            <span
+              className={`px-3 py-1 rounded-full text-white text-sm font-medium ${
+                order.status === "Not Paid" ? "bg-red-500" : "bg-green-500"
+              }`}
+            >
+              {order.status}
+            </span>
+          )}
+          {order.status !== "Deliverd" &&
+            order.status !== "Canceled" &&
+            !user.is_staff && (
+              <button
+                onClick={() => onCancel(order.id)}
+                className="text-blue-700 hover:underline"
+              >
+                Cancel
+              </button>
+            )}
+        </div>
+      </div>
+      <div className="p-6">
+        <h3 className="font-medium text-lg mb-4">Order Items</h3>
+        {/* Order Items Table  */}
+        <OrderTable items={order.items} />
+      </div>
+      <div className="border-t p-6 flex flex-col items-end">
+        <div className="space-y-2 w-full max-w-[200px]">
+          <div className="flex justify-between">
+            <span>Subtotal:</span>
+            <span>${order.total_price.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Shipping:</span>
+            <span>$0.00</span>
+          </div>
+          <div className="flex justify-between font-bold border-t pt-2">
+            <span>Total:</span>
+            <span>${order.total_price.toFixed(2)}</span>
+          </div>
+        </div>
+        {!user.is_staff && order.status === "Not Paid" && (
+          <button className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+            Pay Now
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
 
-    asa kento amier aswer kotha to axios error to amier coda problem ta ke bhi .. 
+export default OrderCard;
+
+components/Orders/OrderItems.jsx
+const OrderItems = ({ item }) => {
+  return (
+    <tr className="border-b hover:bg-gray-50">
+      <td className="px-4 py-3 font-medium">{item.product.name}</td>
+      <td className="px-4 py-3 text-right">${item.price.toFixed(2)}</td>
+      <td className="px-4 py-3 text-right">{item.quantity}</td>
+      <td className="px-4 py-3 text-right">${item.total_price.toFixed(2)}</td>
+    </tr>
+  );
+};
+
+export default OrderItems;
+
+components/Orders/OrderTable.jsx
+import OrderItems from "./OrderItems";
+
+const OrderTable = ({ items }) => {
+  return (
+    <div className="overflow-x-auto">
+      <table className="table-auto w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-50 border-b">
+            <th className="px-4 py-3 text-left">Product</th>
+            <th className="px-4 py-3 text-right">Price</th>
+            <th className="px-4 py-3 text-right">Quantity</th>
+            <th className="px-4 py-3 text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => (
+            // Order Items
+            <OrderItems key={item.id} item={item} />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default OrderTable;
+
+Cart.jsx
+import { Suspense, useEffect, useState } from "react";
+import useCartContext from "../hook/useCartContext";
+import CartItemList from "../components/Cart/CartItemList";
+import CartSummary from "../components/Cart/CartSummary";
+
+const Cart = () => {
+  const {
+    cart,
+    cartId,
+    loading,
+    createOrGetCart,
+    updateCartItemQuantity,
+    deleteCartItems,
+  } = useCartContext();
+
+  const [localCart, setLocalCart] = useState(cart);
+
+  useEffect(() => {
+    if (!cart && !loading) createOrGetCart();
+  }, [createOrGetCart, cart, loading]);
+
+  useEffect(() => {
+    setLocalCart(cart);
+  }, [cart]);
+
+  if (loading) return <p>Loading...</p>;
+  if (!localCart) return <p>No Cart Found</p>;
+
+  const handleUpdateQuantity = async (itemId, newQuantity) => {
+    const prevLocalCartCopy = localCart; // store a copy of localCart
+
+    setLocalCart((prevLocalCart) => {
+      const updatedItmes = prevLocalCart.items.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              quantity: newQuantity,
+              total_price: item.product.price * newQuantity,
+            }
+          : item
+      );
+
+      return {
+        ...prevLocalCart,
+        items: updatedItmes,
+        total_price: updatedItmes.reduce(
+          (sum, item) => sum + item.total_price,
+          0
+        ),
+      };
+    });
+
+    try {
+      await updateCartItemQuantity(itemId, newQuantity);
+    } catch (error) {
+      console.log(error);
+      setLocalCart(prevLocalCartCopy); // Rollback to previous state if API fails
+    }
+  };
+
+  const handleRemoveItem = async (itemId) => {
+    setLocalCart((prevLocalCart) => {
+      const updatedItems = prevLocalCart.items.filter(
+        (item) => item.id != itemId
+      );
+
+      return {
+        ...prevLocalCart,
+        items: updatedItems,
+        total_price: updatedItems.reduce(
+          (sum, item) => sum + item.total_price,
+          0
+        ),
+      };
+    });
+
+    try {
+      await deleteCartItems(itemId);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <Suspense fallback={<p>Loading...</p>}>
+            {localCart?.items && (
+              <CartItemList
+                items={localCart.items}
+                handleUpdateQuantity={handleUpdateQuantity}
+                handleRemoveItem={handleRemoveItem}
+              />
+            )}
+          </Suspense>
+        </div>
+        <div>
+          <CartSummary
+            totalPrice={localCart.total_price || 0}
+            itemCount={localCart.items?.length || 0}
+            cartId={cartId}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Cart;
+
+AppRoutes.jsx
+
+import { Route, Routes } from "react-router-dom";
+import About from "../Pages/About";
+import MainLayout from "../Layouts/MainLayout";
+import Home from "../Pages/Home";
+import Shop from "../Pages/Shop";
+import Login from "../Pages/Login";
+import Register from "../Pages/Register";
+import Dashboard from "../Pages/Dashboard";
+import PrivateRoute from "../components/PrivateRoute";
+import DashboardLayout from "../Layouts/DashboardLayout";
+import Profile from "../Pages/Profile";
+import ProductDetail from "../Pages/ProductDetail";
+import Cart from "../Pages/Cart";
+import Order from "../components/Dashboard/Order";
+import Orders from "../Pages/Orders";
+
+const AppRoutes = () => {
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="about" element={<About />} />
+        <Route path="shop" element={<Shop />} />
+        <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
+        {/* <Route path="activate/:uid/:token" element={<ActivateAccount />} /> */}
+        <Route path="shop/:productId" element={<ProductDetail />} />
+      </Route>
+      {/* Private Routes  */}
+      <Route
+      path="dashboard"
+        element={
+          <PrivateRoute>
+            <DashboardLayout />
+          </PrivateRoute>
+        }
+      >
+        <Route index  element={<Dashboard />} />
+        <Route path="profile"  element={<Profile />} />
+        <Route path="cart"  element={<Cart />} />
+        <Route path="orders"  element={<Orders />} />
+      </Route>
+    </Routes>
+  );
+};
+
+export default AppRoutes;
+
