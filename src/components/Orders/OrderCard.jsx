@@ -7,7 +7,7 @@ const OrderCard = ({ order, onCancel }) => {
   const { user } = useAuthContext();
   const [status, setStatus] = useState(order.status);
   const [loading, setLoading] = useState(false);
-  console.log("Order status:", order.status);
+  // console.log("Order status:", order.status);
 
   const handleStatusChange = async (event) => {
     const newStatus = event.target.value;
@@ -107,15 +107,15 @@ const OrderCard = ({ order, onCancel }) => {
             <span>${order.total_price.toFixed(2)}</span>
           </div>
         </div>
-{!user.is_staff && order.status?.toLowerCase() === "not paid" && (
-  <button
-    className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
-    onClick={handlePayment}
-    disabled={loading}
-  >
-    {loading ? "Processing..." : "Pay Now"}
-  </button>
-)}
+        {!user.is_staff && order.status?.toLowerCase() === "not paid" && (
+          <button
+            className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+            onClick={handlePayment}
+            disabled={loading}
+          >
+            {loading ? "Processing..." : "Pay Now"}
+          </button>
+        )}
       </div>
     </div>
   );
