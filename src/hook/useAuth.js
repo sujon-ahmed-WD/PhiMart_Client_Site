@@ -39,7 +39,7 @@ const useAuth = () => {
       const response = await apiClient.get("auth/users/me/", {
         headers: { Authorization: `JWT ${authTokens?.access}` },
       });
-      setUser(response);
+      setUser(response.data);
     } catch (error) {
       console.log("Error Fetching user:", error.response.data);
     }
