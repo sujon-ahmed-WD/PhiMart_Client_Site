@@ -1,6 +1,4 @@
-// ✅ useCart.js
 import { useCallback, useEffect, useState } from "react";
-import apiClient from "../services/api-client";
 import authApiClient from "../services/auth-api-client";
 
 const useCart = () => {
@@ -11,40 +9,58 @@ const useCart = () => {
   const [cartId, setCartId] = useState(() => localStorage.getItem("cartId"));
   const [loading, setLoading] = useState(false);
 
-  // Create a new Cart ........ ......... .............
+  // ✅ Create or get cart (auto-heal if 404)
   const createOrGetCart = useCallback(async () => {
     setLoading(true);
     try {
       const response = await authApiClient.post("/carts/");
-      // console.log("response", response.data);
-      if (!cartId) {
-        localStorage.setItem("cartId", response.data.id);
-        setCartId(response.data.id);
-      }
+      localStorage.setItem("cartId", response.data.id);
+      setCartId(response.data.id);
       setCart(response.data);
     } catch (error) {
-      console.log(error);
+      console.log("Error creating/getting cart:", error);
+
+      // 🔄 যদি পুরোনো cart invalid হয়, নতুন বানাও
+      if (error.response?.status === 404) {
+        localStorage.removeItem("cartId");
+        setCartId(null);
+        return await createOrGetCart();
+      }
     } finally {
       setLoading(false);
     }
-  }, [ cartId]);
-  // Add items to Cart ....
+  }, []);
+
+  // ✅ Add item to cart and update state
   const AddCartItems = async (product_id, quantity) => {
     setLoading(true);
-    if (!cartId) await createOrGetCart();
     try {
-      const response = await authApiClient.post(`/carts/${cartId}/items/`, {
+      // যদি cart না থাকে, নতুন বানাও
+      if (!cartId) await createOrGetCart();
+
+      await authApiClient.post(`/carts/${cartId}/items/`, {
         product_id,
         quantity,
       });
-      return response.data;
+
+      // cart refresh করে state আপডেট করো
+      const updatedCart = await authApiClient.get(`/carts/${cartId}/`);
+      setCart(updatedCart.data);
     } catch (error) {
-      console.log("Error addinge Items", error);
+      console.log("Error adding items", error);
+
+      // 🔄 যদি cart 404 দেয়, localStorage clear করে আবার নতুন cart তৈরি করো
+      if (error.response?.status === 404) {
+        localStorage.removeItem("cartId");
+        setCartId(null);
+        await createOrGetCart();
+      }
     } finally {
       setLoading(false);
     }
   };
-  // Update Item quantity
+
+  // ✅ Update quantity
   const updateCartItemQuantity = useCallback(
     async (itemId, quantity) => {
       setLoading(true);
@@ -52,6 +68,10 @@ const useCart = () => {
         await authApiClient.patch(`/carts/${cartId}/items/${itemId}/`, {
           quantity,
         });
+
+        // cart refresh করে state update করো
+        const updatedCart = await authApiClient.get(`/carts/${cartId}/`);
+        setCart(updatedCart.data);
       } catch (error) {
         console.log("Error updating cart items", error);
       } finally {
@@ -61,18 +81,23 @@ const useCart = () => {
     [cartId]
   );
 
-  // Delete Cart Items
+  // ✅ Delete item
   const deleteCartItems = useCallback(
     async (itemId) => {
       try {
         await authApiClient.delete(`/carts/${cartId}/items/${itemId}/`);
+
+        // cart refresh
+        const updatedCart = await authApiClient.get(`/carts/${cartId}/`);
+        setCart(updatedCart.data);
       } catch (error) {
-        console.log(error);
+        console.log("Error deleting item", error);
       }
     },
     [cartId]
   );
 
+  // ✅ Initialize cart on mount
   useEffect(() => {
     const initializeCart = async () => {
       setLoading(true);

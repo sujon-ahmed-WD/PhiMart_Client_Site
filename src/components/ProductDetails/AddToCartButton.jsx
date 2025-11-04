@@ -45,12 +45,13 @@ const AddToCartButton = ({ product }) => {
           <FaMinus className="h-4 w-4" />
         </button>
         <input
-          type="number"
-          value={quantity}
-          min={1}
-          max={product.stock}
-          className="input input-bordered join-item w-16 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-        />
+  type="number"
+  value={quantity}
+  min={1}
+  max={product.stock}
+  readOnly
+  className="input input-bordered join-item w-16 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+/>
         <button
           className="btn btn-outline join-item"
           onClick={increaseQuantity}

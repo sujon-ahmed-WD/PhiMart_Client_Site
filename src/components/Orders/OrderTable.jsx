@@ -1,6 +1,7 @@
 import OrderItems from "./OrderItems";
 
 const OrderTable = ({ items }) => {
+  // console.log(items)
   return (
     <div className="overflow-x-auto">
       <table className="table-auto w-full border-collapse">

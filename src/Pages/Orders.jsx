@@ -12,7 +12,7 @@ const Orders = () => {
   const handleCancelOrder = async (orderId) => {
     try {
       const response = await authApiClient.post(`/orders/${orderId}/cancel/`);
-      console.log(response);
+      // console.log(response);
       if (response.status === 200) {
         setOrders((prevOrder) =>
           prevOrder.map((order) =>

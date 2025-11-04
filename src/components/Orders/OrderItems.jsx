@@ -1,4 +1,5 @@
 const OrderItems = ({ item }) => {
+  // console.log(item)
   return (
     <tr className="border-b hover:bg-gray-50">
       <td className="px-4 py-3 font-medium">{item.product.name}</td>

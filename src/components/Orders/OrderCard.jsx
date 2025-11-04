@@ -16,7 +16,7 @@ const OrderCard = ({ order, onCancel }) => {
         `/orders/${order.id}/update_status/`,
         { status: newStatus }
       );
-      console.log(response);
+      // console.log(response);
       if (response.status === 200) {
         setStatus(newStatus);
         alert(response.data.status);
